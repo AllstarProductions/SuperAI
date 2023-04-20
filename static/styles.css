@@ -200,4 +200,15 @@ body {
     content: "Send";
     margin-right: 0;
   }
+  
+  /* adjust input container on smaller screens */
+  .input-container {
+    padding: 4px;
+    flex-direction: column;
+  }
+  
+  #user-input {
+    margin-bottom: 8px;
+  }
 }
+
