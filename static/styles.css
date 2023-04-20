@@ -170,3 +170,34 @@ body {
 }
 
 
+@media only screen and (max-width: 600px) {
+  /* adjust font sizes */
+  body, .header, #user-input, #send-btn, .message, .assistant, .user, .content {
+    font-size: 14px;
+  }
+  
+  /* adjust padding and margins */
+  .chat-container, .chatbox {
+    padding: 8px;
+    max-width: 100%;
+    max-height: calc(100% - 88px);
+    min-height: calc(100% - 88px);
+  }
+  
+  /* adjust icon sizes */
+  .assistant::before, .user::before {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* hide chat icon backgrounds */
+  .assistant::before, .user::before {
+    background: none;
+  }
+  
+  /* adjust send button text */
+  #send-btn::before {
+    content: "Send";
+    margin-right: 0;
+  }
+}
