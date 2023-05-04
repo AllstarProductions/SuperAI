@@ -41,16 +41,11 @@ function removePulsingDots() {
     if (dots) {
         chatbox.removeChild(dots);
     }
-}
-
-function playTypingSound() {
-    const audio = new Audio('');
-    audio.volume = 0.5;
     
 }
 
 async function typeResponse(response) {
-    const typingDelay = 10;
+    const typingDelay = 5;
     const responseElement = document.createElement("div");
     responseElement.classList.add("assistant", "content");
     chatbox.appendChild(responseElement);
@@ -58,7 +53,6 @@ async function typeResponse(response) {
     for (let i = 0; i < response.length; i++) {
         responseElement.innerHTML += response.charAt(i);
         await new Promise((resolve) => setTimeout(resolve, typingDelay));
-        playTypingSound();
     }
 
     chatbox.scrollTop = chatbox.scrollHeight;
