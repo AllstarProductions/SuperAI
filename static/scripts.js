@@ -3,96 +3,106 @@ const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
 const conversationHistory = [
-    {
-        role: "system",
-        content:
-            "You are ChatGPT 3.5 Turbo, the world's best AI Assistant, and are willing to help answer any question as best as possible",
-    },
+  {
+    role: "system",
+    content:
+      "You are ChatGPT 3.5 Turbo, the world's best AI Assistant, and are willing to help answer any question as best as possible",
+  },
 ];
 
 function appendMessage(role, content, hidden = false, invisible = false) {
-    const message = document.createElement("div");
-    message.classList.add("message", role);
-    if (hidden) {
-        message.classList.add("hidden");
-    }
-    if (invisible) {
-        message.classList.add("invisible");
-    }
-    const contentElement = document.createElement("div");
-    contentElement.classList.add("content");
-    contentElement.innerHTML = content.replace(/(?<=\d\.)(?=\s\S)/g, '<br>').replace(/\n/g, '<br>');
-    message.appendChild(contentElement);
-    chatbox.appendChild(message);
-    setTimeout(() => {
-        chatbox.scrollTop = chatbox.scrollHeight;
-    }, 0);
+  const message = document.createElement("div");
+  message.classList.add("message", role);
+  if (hidden) {
+    message.classList.add("hidden");
+  }
+  if (invisible) {
+    message.classList.add("invisible");
+  }
+  const contentElement = document.createElement("div");
+  contentElement.classList.add("content");
+  contentElement.innerHTML = content.replace(/(?<=\d\.)(?=\s\S)/g, '<br>').replace(/\n/g, '<br>');
+  message.appendChild(contentElement);
+  chatbox.appendChild(message);
+  setTimeout(() => {
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }, 0);
 }
 
 function showPulsingDots() {
-    const dots = document.createElement("div");
-    dots.classList.add("pulsing-dots");
-    dots.innerHTML = '<span>.</span><span>.</span><span>.</span>';
-    chatbox.appendChild(dots);
+  const dots = document.createElement("div");
+  dots.classList.add("pulsing-dots");
+  dots.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+  chatbox.appendChild(dots);
 }
 
 function removePulsingDots() {
-    const dots = chatbox.querySelector(".pulsing-dots");
-    if (dots) {
-        chatbox.removeChild(dots);
-    }
-    
+  const dots = chatbox.querySelector(".pulsing-dots");
+  if (dots) {
+    chatbox.removeChild(dots);
+  }
+}
+
+function displayResponse(response) {
+  const responseElement = document.createElement("div");
+  responseElement.classList.add("assistant", "content");
+  responseElement.innerHTML = response;
+  chatbox.appendChild(responseElement);
+  chatbox.scrollTop = chatbox.scrollHeight;
 }
 
 async function typeResponse(response) {
-    const typingDelay = 5;
-    const responseElement = document.createElement("div");
-    responseElement.classList.add("assistant", "content");
-    chatbox.appendChild(responseElement);
+  const responseElement = document.createElement("div");
+  responseElement.classList.add("assistant", "content");
+  chatbox.appendChild(responseElement);
 
-    for (let i = 0; i < response.length; i++) {
-        responseElement.innerHTML += response.charAt(i);
-        await new Promise((resolve) => setTimeout(resolve, typingDelay));
-    }
+  // Wait for a short time before displaying the response
+  await new Promise((resolve) => setTimeout(resolve, 200));
 
-    chatbox.scrollTop = chatbox.scrollHeight;
+  // Display the entire response at once
+  responseElement.innerHTML = response;
+
+  chatbox.scrollTop = chatbox.scrollHeight;
 }
 
 sendBtn.addEventListener("click", async () => {
-    const message = userInput.value.trim();
-    if (!message) return;
+  const message = userInput.value.trim();
+  if (!message) return;
 
-    userInput.value = "";
-    appendMessage("user", message);
-    conversationHistory.push({ role: "user", content: message });
+  userInput.value = "";
+  appendMessage("user", message);
+  conversationHistory.push({ role: "user", content: message });
 
-    // Show pulsing dots
-    showPulsingDots();
+  // Show pulsing dots
+  showPulsingDots();
 
-    const response = await fetch("/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ messages: conversationHistory }),
-    });
+  const response = await fetch("/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ messages: conversationHistory }),
+  });
 
-    const data = await response.json();
+  const data = await response.json();
 
-    // Remove pulsing dots
-    removePulsingDots();
+  // Remove pulsing dots
+  removePulsingDots();
 
-    // Type out the response with a typing sound
-    await typeResponse(data.response);
+  // Display the response as fast as possible
+  displayResponse(data.response);
 
-    conversationHistory.push({ role: "assistant", content: data.response });
+  conversationHistory.push({ role: "assistant", content: data.response });
 });
 
 userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        sendBtn.click();
-    }
+  if (e.key === "Enter") {
+    sendBtn.click();
+  }
 });
 
-appendMessage("system", "You are ChatGPT 3.5 Turbo, the world's best AI Assistant, and are willing to help answer any question as best as possible", true);
-
+appendMessage(
+  "system",
+  "You are ChatGPT 3.5 Turbo, the world's best AI Assistant, and are willing to help answer any question as best as possible",
+  true
+);
